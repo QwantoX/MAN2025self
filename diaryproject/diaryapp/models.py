@@ -6,19 +6,19 @@ class Teacher(models.Model):
     name = models.CharField(max_length=30)
 
     def __str__(self):
-        return self.name
+        return f"ID: {self.id}, Teacher: {self.name}"
 
 class Subject(models.Model):
     name = models.CharField(max_length=30)
 
     def __str__(self):
-        return self.name
+        return f"ID: {self.id}, Subject: {self.name}"
 
 class Class(models.Model):
     name = models.CharField(max_length=10)
 
     def __str__(self):
-        return self.name
+        return f"ID: {self.id}, Class: {self.name}"
 
 class TeachingAssignment(models.Model):
     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name='assignments')
@@ -29,4 +29,4 @@ class TeachingAssignment(models.Model):
         unique_together = ('teacher', 'subject', 'school_class')  # унікальність
 
     def __str__(self):
-        return f"{self.teacher.name} викладає {self.subject.name} у {self.school_class.name}"
+        return f"ID: {self.id}, {self.teacher.name} викладає {self.subject.name} у {self.school_class.name}"
