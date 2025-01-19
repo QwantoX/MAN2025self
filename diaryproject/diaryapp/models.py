@@ -1,39 +1,5 @@
-# from django.db import models
-
-# # Create your models here.
-
-# class Teacher(models.Model):
-#     name = models.CharField(max_length=30)
-
-#     def __str__(self):
-#         return f"ID: {self.id}, Teacher: {self.name}"
-
-# class Subject(models.Model):
-#     name = models.CharField(max_length=30)
-
-#     def __str__(self):
-#         return f"ID: {self.id}, Subject: {self.name}"
-
-# class Class(models.Model):
-#     name = models.CharField(max_length=10)
-
-#     def __str__(self):
-#         return f"ID: {self.id}, Class: {self.name}"
-
-# class TeachingAssignment(models.Model):
-#     teacher = models.ForeignKey(Teacher, on_delete=models.CASCADE, related_name='assignments')
-#     subject = models.ForeignKey(Subject, on_delete=models.CASCADE, related_name='assignments')
-#     school_class = models.ForeignKey(Class, on_delete=models.CASCADE, related_name='assignments')
-
-#     class Meta:
-#         unique_together = ('teacher', 'subject', 'school_class')  # унікальність
-
-#     def __str__(self):
-#         return f"ID: {self.id}, {self.teacher.name} викладає {self.subject.name} у {self.school_class.name}"
-
-
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 from django.db import models
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, password=None, **extra_fields):
@@ -49,6 +15,18 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, username, password, **extra_fields)
+
+class Subject(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+class SchoolClass(models.Model):
+    name = models.CharField(max_length=50)
+
+    def __str__(self):
+        return self.name
 
 class CustomUser(AbstractBaseUser):
     email = models.EmailField(unique=True)
@@ -67,6 +45,8 @@ class CustomUser(AbstractBaseUser):
     ]
 
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='user')
+    assigned_subjects = models.ManyToManyField(Subject, blank=True)
+    assigned_classes = models.ManyToManyField(SchoolClass, blank=True)
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
