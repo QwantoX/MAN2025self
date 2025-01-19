@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, password=None, **extra_fields):
@@ -28,7 +28,7 @@ class SchoolClass(models.Model):
     def __str__(self):
         return self.name
 
-class CustomUser(AbstractBaseUser):
+class CustomUser(AbstractBaseUser, PermissionsMixin):  #PermissionsMixin
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=30, unique=True)
     first_name = models.CharField(max_length=50, blank=True)
@@ -55,3 +55,14 @@ class CustomUser(AbstractBaseUser):
 
     def __str__(self):
         return self.email
+    def has_perm(self, perm, obj=None):
+        """
+        Чи має користувач конкретне право.
+        """
+        return self.is_superuser
+
+    def has_module_perms(self, app_label):
+        """
+        Чи має користувач доступ до модулів програми.
+        """
+        return self.is_superuser
