@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
-
+from django.core.validators import MinValueValidator, MaxValueValidator
 class CustomUserManager(BaseUserManager):
     def create_user(self, email, username, password=None, **extra_fields):
         if not email:
@@ -66,3 +66,20 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):  #PermissionsMixin
         Чи має користувач доступ до модулів програми.
         """
         return self.is_superuser
+
+
+#
+
+class Grade(models.Model):
+    student = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='grades')
+    subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
+    teacher = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='given_grades')
+    school_class = models.ForeignKey(SchoolClass, on_delete=models.CASCADE)
+    grade = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])
+    date = models.DateField()
+
+    class Meta:
+        ordering = ['date']
+
+    def __str__(self):
+        return f"{self.student.username} - {self.subject.name} - {self.grade}"

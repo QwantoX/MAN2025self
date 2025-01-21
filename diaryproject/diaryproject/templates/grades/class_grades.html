@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% load grade_filters %}
+{% block content %}
+<div class="container mt-4">
+    <h2>{{ school_class.name }} - Оцінки</h2>
+    
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Учень</th>
+                {% for subject in subjects %}
+                <th>{{ subject.name }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for student in students %}
+            <tr>
+                <td>{{ student.username }}</td>
+                {% for subject in subjects %}
+                <td>
+                    {% if user.role != 'user' %}
+                    <form method="POST" class="d-inline">
+                        {% csrf_token %}
+                        <input type="hidden" name="student" value="{{ student.id }}">
+                        <input type="hidden" name="subject" value="{{ subject.id }}">
+                        <input type="hidden" name="school_class" value="{{ school_class.id }}">
+                        {{ form.date }}
+                        {{ form.grade }}
+                        <button type="submit" class="btn btn-sm btn-primary">+</button>
+                    </form>
+                    {% endif %}
+                    
+                    <div>
+                        {% for grade in students_grades|get_item:student.id %}
+                            {% if grade.subject == subject %}
+                                {{ grade.grade }}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
