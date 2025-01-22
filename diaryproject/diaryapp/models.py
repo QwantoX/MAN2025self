@@ -82,7 +82,7 @@ class Grade(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     teacher = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='given_grades')
     school_class = models.ForeignKey(SchoolClass, on_delete=models.CASCADE)
-    grade = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])
+    grade = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(3)])
     date = models.DateField()
 
     class Meta:

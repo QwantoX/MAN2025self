@@ -23,7 +23,6 @@ class CustomUserAdmin(UserAdmin):
     ordering = ('email',)
     filter_horizontal = ('assigned_subjects', 'assigned_classes')
 
-# Реєструємо моделі в адмін-панелі
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Subject)
 admin.site.register(SchoolClass)

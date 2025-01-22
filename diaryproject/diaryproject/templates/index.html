@@ -1,6 +1,26 @@
 {% extends 'base.html' %}
-<!-- {% block title %}Diary{% endblock %} -->
 
 {% block content %}
-    <h1>Template homepage</h1>
+    <div class="container mt-4">
+        <h1>Вітаємо на головній сторінці!</h1>
+        <div class="alert alert-info" role="alert">
+            Привіт, {{ user.first_name|default:user.username }} {{ user.last_name|default:'' }}!
+        </div>
+        <div class="mb-4">
+            <h4>Інформація про користувача:</h4>
+            <ul>
+                <li><strong>Ім'я:</strong> {{ user.first_name|default:user.username }}</li>
+                <li><strong>По-батькові:</strong> {{ user.last_name|default:'Не вказано' }}</li>
+                <li><strong>Нікнейм:</strong> {{ user.username }}</li>
+                <li><strong>Email:</strong> {{ user.email }}</li>
+                <li><strong>Роль:</strong> {{ user.role }}</li>
+            </ul>
+        </div>
+
+        <!-- Зв'язок з проектом -->
+        <div class="mt-4">
+            <h4>Проект "Diary"</h4>
+            <p>Цей проект призначений для керування оцінками учнів. Ви можете переглядати свої оцінки, відстежувати успіхи і багато іншого.</p>
+        </div>
+    </div>
 {% endblock %}
