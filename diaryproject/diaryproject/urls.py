@@ -27,4 +27,5 @@ urlpatterns = [
     path('logout/', views.logout_view, name='logout'),
     path('class/<int:class_id>/', views.class_grades, name='class_grades'),
     path('grades/', views.user_grades, name='user_grades'),
+    path('manage-grade/<int:class_id>/', views.manage_grade, name='manage_grade'),
 ]

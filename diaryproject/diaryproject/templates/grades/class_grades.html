@@ -20,7 +20,7 @@
                 {% for subject in subjects %}
                 <td>
                     {% if user.role != 'user' %}
-                    <form method="POST" class="d-inline">
+                    <form class="grade-form d-inline">
                         {% csrf_token %}
                         <input type="hidden" name="student" value="{{ student.id }}">
                         <input type="hidden" name="subject" value="{{ subject.id }}">
@@ -29,13 +29,17 @@
                         {{ form.grade }}
                         <button type="submit" class="btn btn-sm btn-primary">+</button>
                     </form>
-                    
                     {% endif %}
                     
-                    <div>
+                    <div class="grades-container">
                         {% for grade in students_grades|get_item:student.id %}
                             {% if grade.subject == subject %}
-                                {{ grade.grade }}
+                                <span class="grade-item" data-grade-id="{{ grade.id }}">
+                                    {{ grade.grade }}
+                                    {% if user == grade.teacher %}
+                                    <a href="#" class="delete-grade text-danger ms-1">×</a>
+                                    {% endif %}
+                                </span>
                             {% endif %}
                         {% endfor %}
                     </div>
@@ -46,4 +50,66 @@
         </tbody>
     </table>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+    // Handle grade addition
+    document.querySelectorAll('.grade-form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            
+            fetch('{% url "manage_grade" school_class.id %}', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrfToken
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    const gradesContainer = this.nextElementSibling;
+                    const gradeSpan = document.createElement('span');
+                    gradeSpan.className = 'grade-item';
+                    gradeSpan.dataset.gradeId = data.grade_id;
+                    gradeSpan.innerHTML = `
+                        ${data.grade_value}
+                        <a href="#" class="delete-grade text-danger ms-1">×</a>
+                    `;
+                    gradesContainer.appendChild(gradeSpan);
+                }
+            });
+        });
+    });
+
+    // Handle grade deletion
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('delete-grade')) {
+            e.preventDefault();
+            if (!confirm('Ви впевнені?')) return;
+            
+            const gradeItem = e.target.closest('.grade-item');
+            const gradeId = gradeItem.dataset.gradeId;
+
+            fetch(`{% url "manage_grade" school_class.id %}?grade_id=${gradeId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrfToken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    gradeItem.remove();
+                }
+            });
+        }
+    });
+});
+</script>
 {% endblock %}

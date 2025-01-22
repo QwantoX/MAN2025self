@@ -120,3 +120,53 @@ def user_grades(request):
         'grades_by_subject': grades_by_subject,
     }
     return render(request, 'grades/user_grades.html', context)
+
+
+from django.http import JsonResponse
+
+@login_required
+@user_passes_test(is_teacher_or_admin)
+def manage_grade(request, class_id):
+    if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+        if request.method == 'POST':
+            form = GradeForm(request.POST, user=request.user)
+            if form.is_valid():
+                grade = form.save(commit=False)
+                grade.teacher = request.user
+                grade.save()
+                return JsonResponse({
+                    'status': 'success',
+                    'grade_id': grade.id,
+                    'grade_value': grade.grade
+                })
+            return JsonResponse({'status': 'error'}, status=400)
+        
+        elif request.method == 'DELETE':
+            grade_id = request.GET.get('grade_id')
+            try:
+                grade = Grade.objects.get(id=grade_id, teacher=request.user)
+                grade.delete()
+                return JsonResponse({'status': 'success'})
+            except Grade.DoesNotExist:
+                return JsonResponse({'status': 'error'}, status=404)
+    
+    school_class = SchoolClass.objects.get(id=class_id)
+    students = CustomUser.objects.filter(assigned_classes=school_class, role='user')
+    subjects = request.user.assigned_subjects.all()
+    
+    students_grades = {}
+    for student in students:
+        grades = Grade.objects.filter(
+            student=student,
+            school_class=school_class
+        ).order_by('subject', 'date')
+        students_grades[student.id] = grades
+
+    context = {
+        'school_class': school_class,
+        'students': students,
+        'subjects': subjects,
+        'students_grades': students_grades,
+        'form': GradeForm(user=request.user, initial={'school_class': school_class}),
+    }
+    return render(request, 'grades/class_grades.html', context)
