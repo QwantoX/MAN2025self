@@ -53,6 +53,11 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):  #PermissionsMixin
 
     objects = CustomUserManager()
 
+    def get_full_name(self):
+        if self.first_name or self.last_name:
+            return f"{self.first_name} {self.last_name}".strip()
+        return self.username
+
     def __str__(self):
         return self.email
     def has_perm(self, perm, obj=None):
@@ -67,6 +72,8 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):  #PermissionsMixin
         """
         return self.is_superuser
 
+
+    
 
 #
 

@@ -2,11 +2,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, redirect
 from django.contrib import messages
-from .models import SchoolClass
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import user_passes_test
+from django.db import models
 
-from django.http import HttpResponseForbidden
-from .models import CustomUser,Grade, Subject
 from .forms import GradeForm
+from .models import SchoolClass,CustomUser,Grade
 
 def login_view(request):
     if request.method == 'POST':
@@ -25,7 +26,7 @@ def login_view(request):
 
 @login_required
 def index(request):
-    school_classes = SchoolClass.objects.all() #navbar 'disabled'
+    school_classes = request.user.assigned_classes.all()
     context = {
         'school_classes': school_classes
     }
@@ -41,12 +42,6 @@ def logout_view(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
-
-
-
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.decorators import user_passes_test
 
 def is_teacher_or_admin(user):
     return user.role in ['moderator', 'admin']
@@ -93,18 +88,34 @@ def class_grades(request, class_id):
 @login_required
 def user_grades(request):
     if request.user.role != 'user':
-        return redirect('home')  # або інша відповідна сторінка
+        return redirect('home') 
         
-    # Отримуємо всі оцінки користувача, згруповані за предметами
     grades = Grade.objects.filter(student=request.user).order_by('subject', '-date')
     
-    # Групуємо оцінки за предметами
     grades_by_subject = {}
     for grade in grades:
         if grade.subject not in grades_by_subject:
             grades_by_subject[grade.subject] = []
         grades_by_subject[grade.subject].append(grade)
     
+    context = {
+        'grades_by_subject': grades_by_subject,
+    }
+    return render(request, 'grades/user_grades.html', context)
+
+
+@login_required
+def user_grades(request):
+    if request.user.role != 'user':
+        return redirect('home')
+
+    grades = Grade.objects.filter(student=request.user).order_by('subject', '-date')
+    grades_by_subject = {}
+    for grade in grades:
+        if grade.subject not in grades_by_subject:
+            grades_by_subject[grade.subject] = []
+        grades_by_subject[grade.subject].append(grade)
+
     context = {
         'grades_by_subject': grades_by_subject,
     }
