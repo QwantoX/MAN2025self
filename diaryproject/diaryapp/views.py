@@ -85,23 +85,23 @@ def class_grades(request, class_id):
     return render(request, 'grades/class_grades.html', context)
 
 
-@login_required
-def user_grades(request):
-    if request.user.role != 'user':
-        return redirect('home') 
+# @login_required
+# def user_grades(request):
+#     if request.user.role != 'user':
+#         return redirect('home') 
         
-    grades = Grade.objects.filter(student=request.user).order_by('subject', '-date')
+#     grades = Grade.objects.filter(student=request.user).order_by('subject', '-date')
     
-    grades_by_subject = {}
-    for grade in grades:
-        if grade.subject not in grades_by_subject:
-            grades_by_subject[grade.subject] = []
-        grades_by_subject[grade.subject].append(grade)
+#     grades_by_subject = {}
+#     for grade in grades:
+#         if grade.subject not in grades_by_subject:
+#             grades_by_subject[grade.subject] = []
+#         grades_by_subject[grade.subject].append(grade)
     
-    context = {
-        'grades_by_subject': grades_by_subject,
-    }
-    return render(request, 'grades/user_grades.html', context)
+#     context = {
+#         'grades_by_subject': grades_by_subject,
+#     }
+#     return render(request, 'grades/user_grades.html', context)
 
 
 @login_required
@@ -110,6 +110,7 @@ def user_grades(request):
         return redirect('home')
 
     grades = Grade.objects.filter(student=request.user).order_by('subject', '-date')
+
     grades_by_subject = {}
     for grade in grades:
         if grade.subject not in grades_by_subject:
