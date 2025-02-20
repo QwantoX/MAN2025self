@@ -62,13 +62,13 @@ class CustomUser(AbstractBaseUser, PermissionsMixin):  #PermissionsMixin
         return self.email
     def has_perm(self, perm, obj=None):
         """
-        Чи має користувач конкретне право.
+        конкретне право.
         """
         return self.is_superuser
 
     def has_module_perms(self, app_label):
         """
-        Чи має користувач доступ до модулів програми.
+        доступ до модулів програми.
         """
         return self.is_superuser
 

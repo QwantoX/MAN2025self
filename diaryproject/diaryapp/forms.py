@@ -14,10 +14,8 @@ from .models import CustomUser, Subject, SchoolClass
 
 #         instance = kwargs.get('instance')
 #         if instance and instance.role == 'user':
-#             # Якщо користувач звичайний, дозволяємо лише 1 клас
 #             self.fields['assigned_classes'].widget = forms.Select()
 #         else:
-#             # Для модератора чи адміна дозволяємо множинний вибір
 #             self.fields['assigned_subjects'].widget = forms.SelectMultiple()
 #             self.fields['assigned_classes'].widget = forms.SelectMultiple()
 
